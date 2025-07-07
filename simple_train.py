@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import xgboost as xgb
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, roc_auc_score, classification_report
 import joblib
@@ -9,7 +9,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def train_and_save_model():
-    """Train XGBoost model and save for deployment"""
+    """Train XGBoost model with hyperparameter tuning and save for deployment"""
     
     print("🚀 Starting model training...")
     
@@ -35,22 +35,43 @@ def train_and_save_model():
     
     print("✅ Data preprocessing completed")
     
-    # Train XGBoost model with optimized parameters
-    model = xgb.XGBClassifier(
-        n_estimators=200,
-        max_depth=3,
-        learning_rate=0.01,
-        subsample=0.8,
-        colsample_bytree=1.0,
-        reg_alpha=0,
-        reg_lambda=2,
+    # Define hyperparameter grid
+    param_grid = {
+        'n_estimators': [100, 200, 300],
+        'max_depth': [3, 4, 5],
+        'learning_rate': [0.01, 0.1, 0.2],
+        'subsample': [0.8, 0.9, 1.0],
+        'colsample_bytree': [0.8, 0.9, 1.0],
+        'reg_alpha': [0, 0.1, 0.5],
+        'reg_lambda': [1, 1.5, 2]
+    }
+    
+    # Initialize XGBoost model
+    xgb_model = xgb.XGBClassifier(
         objective='binary:logistic',
         eval_metric='logloss',
         random_state=42
     )
     
-    print("🔧 Training model...")
-    model.fit(X_train_scaled, y_train)
+    print("🔧 Performing hyperparameter tuning...")
+    # Perform GridSearchCV
+    grid_search = GridSearchCV(
+        estimator=xgb_model,
+        param_grid=param_grid,
+        cv=5,
+        scoring='roc_auc',
+        n_jobs=-1,
+        verbose=1
+    )
+    
+    # Fit the grid search
+    grid_search.fit(X_train_scaled, y_train)
+    
+    # Get the best model
+    model = grid_search.best_estimator_
+    
+    print(f"Best parameters: {grid_search.best_params_}")
+    print(f"Best CV score: {grid_search.best_score_:.4f}")
     
     # Evaluate model
     y_pred = model.predict(X_test_scaled)
