@@ -92,7 +92,7 @@ def train_and_save_model():
 
     # Save model and scaler
     print("💾 Saving model files...")
-    model.save_model('model.json')  # Save XGBoost model as JSON
+    model.save_model('model.pkl')  # Save XGBoost model as JSON
     joblib.dump(scaler, 'scaler.pkl')
 
     # Save feature names
@@ -102,7 +102,7 @@ def train_and_save_model():
 
     print("✅ Model saved successfully!")
     print("Files created:")
-    print("  - model.json (XGBoost model)")
+    print("  - model.pkl (XGBoost model)")
     print("  - scaler.pkl (StandardScaler)")
     print("  - feature_names.txt (Feature names)")
 
