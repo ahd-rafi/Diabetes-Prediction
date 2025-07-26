@@ -3,6 +3,7 @@
 
 
 
+
 # Diabetes Prediction App
 
 A Streamlit-based web application for predicting diabetes risk using an XGBoost model trained on the Pima Indians Diabetes Dataset. The app allows users to input patient data and receive a diabetes risk prediction with visualizations.
